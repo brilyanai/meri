@@ -1,0 +1,439 @@
+{
+  "name": "MERI Assistant AI - Operation Stage",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Baca isi didalam dokumen vector, jadikan referensi untuk menjawab. Fokus ke isi database saja, kalau keluar dari isi, sampaikan bahwa saya belum mengetahuinya"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2224,
+        464
+      ],
+      "id": "c5c15f78-6f4e-4826-8679-e1c36c99b923",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1904,
+        464
+      ],
+      "id": "6db9cd36-f763-4bd8-9aca-94ab349cdf62",
+      "name": "When chat message received",
+      "webhookId": "80be281b-61a7-4f6f-bc2b-3184f11b2a99"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2272,
+        704
+      ],
+      "id": "dd5d402c-680f-4ebb-bf81-2081603cbe11",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "jltcSdJSHrRvhtch",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "gunakan untuk mengambil data dokumen",
+        "milvusCollection": {
+          "__rl": true,
+          "value": "document",
+          "mode": "list",
+          "cachedResultName": "document"
+        },
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        672
+      ],
+      "id": "a7214869-518a-484f-9091-d1b89716e189",
+      "name": "Milvus Vector Store1",
+      "credentials": {
+        "milvusApi": {
+          "id": "M9yYqb3I7CQPCkHY",
+          "name": "Milvus account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2496,
+        848
+      ],
+      "id": "26297add-7fb4-46f4-ab88-6c13ffaf8e15",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "jltcSdJSHrRvhtch",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@devlikeapro/n8n-nodes-waha.wahaTrigger",
+      "typeVersion": 202502,
+      "position": [
+        688,
+        448
+      ],
+      "id": "b2976668-e422-420f-8e2e-e1ecf9995ad3",
+      "name": "WAHA Trigger",
+      "webhookId": "986c9a8b-1d35-47fb-80f0-08e5f4fae200"
+    },
+    {
+      "parameters": {
+        "resource": "Chatting",
+        "operation": "Send Text",
+        "session": "=default",
+        "chatId": "=6281241572296@c.us",
+        "text": "={{ $json.output }}",
+        "requestOptions": {}
+      },
+      "type": "@devlikeapro/n8n-nodes-waha.WAHA",
+      "typeVersion": 202502,
+      "position": [
+        1520,
+        464
+      ],
+      "id": "c8948198-1037-4453-9c18-dfb140fbc8aa",
+      "name": "Send a text message",
+      "credentials": {
+        "wahaApi": {
+          "id": "bg9PxfmsoqFHWqaq",
+          "name": "WAHA account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "WAHA Orkestrasi",
+        "height": 960,
+        "width": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        640,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "9fa63f5d-514d-4d25-9be8-a694b3390dfb",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "AI Chat Testing",
+        "height": 576,
+        "width": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1744,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "c6b8af45-660e-4b3b-b835-af0d2e962e5c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.payload.body }}",
+        "options": {
+          "systemMessage": "Anda adalah asisten cerdas atas nama SULTAN YASIN yang bertugas membantu analisis dan penjelasan dokumen resmi terkait kegiatan Diklat dan Pelatihan Pegawai.\n\nTerdapat dua sumber data (vector store) yang dapat Anda gunakan:\n1. **diklat** — berisi dokumen tentang kegiatan Diklat, seperti materi pembelajaran, tujuan, peserta, jadwal, dan hasil evaluasi.\n2. **kinerja_dan_diklat** — berisi dokumen gabungan tentang Diklat dan Pelatihan Pegawai, termasuk program pengembangan kompetensi, pelatihan teknis/manajerial, serta penilaian kinerja setelah pelatihan.\n\n## Pedoman:\n- Gunakan **diklat** jika pertanyaan pengguna hanya berkaitan dengan *diklat* internal atau kegiatan pendidikan pegawai.\n- Gunakan **kinerja_dan_diklat** jika pertanyaan berkaitan dengan *pelatihan*, *pengembangan kompetensi*, atau *evaluasi kinerja* pasca-pelatihan.\n- Gunakan kedua data source tersebut jika ada pertanyaan terkait kinerja dan diklat\n- Gunakan bahasa yang formal dan profesional.\n- Jika informasi tidak ditemukan dalam konteks, jawab dengan:  \n  “Maaf, saya tidak menemukan informasi tersebut dalam dokumen yang tersedia.”\n- Jangan menebak atau membuat informasi baru di luar dokumen yang diberikan.\n- Jika memungkinkan, sertakan sumber atau bagian dokumen (misalnya nama program atau tahun) dalam jawaban Anda.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        464
+      ],
+      "id": "24183704-3ab4-4fc4-9e6c-c91c457014ff",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1472,
+        976
+      ],
+      "id": "ec0f7666-9b4a-4df0-963a-62fbe85138ef",
+      "name": "Embeddings OpenAI5",
+      "credentials": {
+        "openAiApi": {
+          "id": "jltcSdJSHrRvhtch",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        784
+      ],
+      "id": "825d72ea-4c70-4d5c-b0e0-946fc3fe91c3",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "jltcSdJSHrRvhtch",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        976
+      ],
+      "id": "febc52ce-6f7c-43c1-b47b-c6085e93b790",
+      "name": "Embeddings OpenAI6",
+      "credentials": {
+        "openAiApi": {
+          "id": "jltcSdJSHrRvhtch",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "gunakan untuk mengambil data dokumen kinerja atau diklat",
+        "milvusCollection": {
+          "__rl": true,
+          "value": "merit_db",
+          "mode": "list",
+          "cachedResultName": "merit_db"
+        },
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        768
+      ],
+      "id": "31f93776-bb3b-4c66-9ad7-a8b4dfa7a988",
+      "name": "kinerja_dan_diklat",
+      "credentials": {
+        "milvusApi": {
+          "id": "M9yYqb3I7CQPCkHY",
+          "name": "Milvus account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Koleksi embedding dari dokumen diklat yang berisi informasi terkait kegiatan pendidikan dan pelatihan internal pegawai.\nDokumen ini mencakup materi diklat, tujuan pembelajaran, peserta, jadwal, dan hasil evaluasi pelaksanaan diklat",
+        "milvusCollection": {
+          "__rl": true,
+          "value": "diklat",
+          "mode": "list",
+          "cachedResultName": "diklat"
+        },
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreMilvus",
+      "typeVersion": 1.3,
+      "position": [
+        1120,
+        768
+      ],
+      "id": "a8094e9c-5102-4235-8503-2fa10d6baf03",
+      "name": "diklat",
+      "credentials": {
+        "milvusApi": {
+          "id": "M9yYqb3I7CQPCkHY",
+          "name": "Milvus account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Milvus Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Milvus Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WAHA Trigger": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI5": {
+      "ai_embedding": [
+        [
+          {
+            "node": "kinerja_dan_diklat",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI6": {
+      "ai_embedding": [
+        [
+          {
+            "node": "diklat",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "kinerja_dan_diklat": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "diklat": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "21ba8413-bd68-400d-8d5a-3dbcc562232f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9bb94f6c8e760dcf334811f35150796a5e762067a8a9d047f6c2b44ca87aca99"
+  },
+  "id": "ROD4tsys9iH5awm3",
+  "tags": []
+}

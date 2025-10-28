@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha
+    restart: always
+    ports:
+      - "3000:3000" # API Port
+    environment:
+      - WAHA_LICENSE=${WAHA_LICENSE}
+      - WAHA_LOG_LEVEL=${WAHA_LOG_LEVEL}
+      - WAHA_HTTP_API_PORT=${WAHA_HTTP_API_PORT}
+      - WAHA_SESSION_STORAGE=${WAHA_SESSION_STORAGE}
+      - WAHA_SESSION_STORAGE_PATH=${WAHA_SESSION_STORAGE_PATH}
+      - WAHA_WEBHOOK_URL=${WAHA_WEBHOOK_URL}
+    volumes:
+      - ./data/sessions:/sessions
+    networks:
+      - waha-net
+
+networks:
+  waha-net:
+    driver: bridge
