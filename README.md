@@ -8,6 +8,6 @@ AI Chatbot ASN: Transformasi Digital Sistem Merit dan Karier ASN
 - `installations/`  → berisi konfigurasi container software yang digunakan ( n8n + milvus + waha) dengan docker compose .yml 
 
 # Author
-- Zasli Afandy
+- Zasli Afandi Baharuddin
 - Syahri Ramadhan
 - Maharani Ayu Lestari
